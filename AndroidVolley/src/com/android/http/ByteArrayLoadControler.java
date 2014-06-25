@@ -4,7 +4,13 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
-class ByteArrayLoadControler extends AbsLoadControler implements LoadControler, Listener<byte[]>, ErrorListener {
+/**
+ * ByteArrayLoadControler implements Volley Listener & ErrorListener
+ * 
+ * @author steven pan
+ * 
+ */
+class ByteArrayLoadControler extends AbsLoadControler implements Listener<byte[]>, ErrorListener {
 	private LoadListener mOnLoadListener;
 	private int mAction = 0;
 
@@ -22,7 +28,7 @@ class ByteArrayLoadControler extends AbsLoadControler implements LoadControler, 
 			try {
 				errorMsg = "Server Response Error (" + error.networkResponse.statusCode + ")";
 			} catch (Exception e) {
-				errorMsg="Server Response Error";
+				errorMsg = "Server Response Error";
 			}
 		}
 		this.mOnLoadListener.onError(errorMsg, getOriginUrl(), this.mAction);

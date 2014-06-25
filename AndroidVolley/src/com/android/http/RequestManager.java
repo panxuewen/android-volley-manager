@@ -12,6 +12,7 @@ import com.android.volley.RetryPolicy;
 import com.android.volley.toolbox.Volley;
 
 /**
+ * RequestManager
  * 
  * @author steven pan
  * 
@@ -50,6 +51,7 @@ public class RequestManager {
 
 	/**
 	 * default get method
+	 * 
 	 * @param url
 	 * @param requestListener
 	 * @param actionId
@@ -58,29 +60,43 @@ public class RequestManager {
 	public LoadControler get(String url, RequestListener requestListener, int actionId) {
 		return this.get(url, requestListener, true, actionId);
 	}
-	
+
 	public LoadControler get(String url, RequestListener requestListener, boolean shouldCache, int actionId) {
 		return this.request(Method.GET, url, null, requestListener, shouldCache, 10 * 1000, 1, actionId);
 	}
 
 	/**
 	 * default post method
+	 * 
 	 * @param url
 	 * @param data
+	 *            String or Map<String, String>
 	 * @param requestListener
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler post(final String url, String data, final RequestListener requestListener, int actionId) {
+	public LoadControler post(final String url, Object data, final RequestListener requestListener, int actionId) {
 		return this.post(url, data, requestListener, false, 10 * 1000, 1, actionId);
 	}
 
-	public LoadControler post(final String url, String data, final RequestListener requestListener,
+	/**
+	 * 
+	 * @param url
+	 * @param data
+	 *            String or Map<String, String>
+	 * @param requestListener
+	 * @param shouldCache
+	 * @param timeoutCount
+	 * @param retryTimes
+	 * @param actionId
+	 * @return
+	 */
+	public LoadControler post(final String url, Object data, final RequestListener requestListener,
 			boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
 		return request(Method.POST, url, data, requestListener, shouldCache, timeoutCount, retryTimes, actionId);
 	}
 
-	public LoadControler request(int method, final String url, String data, final RequestListener requestListener,
+	public LoadControler request(int method, final String url, Object data, final RequestListener requestListener,
 			boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
 		return this.sendRequest(method, url, data, new LoadListener() {
 			@Override
@@ -106,7 +122,7 @@ public class RequestManager {
 		}, shouldCache, timeoutCount, retryTimes, actionId);
 	}
 
-	public LoadControler sendRequest(int method, final String url, String data, final LoadListener requestListener,
+	public LoadControler sendRequest(int method, final String url, Object data, final LoadListener requestListener,
 			boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
 		if (requestListener == null)
 			throw new NullPointerException();

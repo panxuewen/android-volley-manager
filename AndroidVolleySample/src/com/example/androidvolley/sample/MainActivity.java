@@ -1,5 +1,7 @@
 package com.example.androidvolley.sample;
 
+import java.util.HashMap;
+
 import android.app.Activity;
 import android.os.Bundle;
 
@@ -24,7 +26,10 @@ public class MainActivity extends Activity {
 	 * test POST method
 	 */
 	private void testPost() {
-		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", null, requestListener, 0);
+		HashMap<String, String> map=new HashMap<String, String>();
+		map.put("aa", "hello,world");
+		map.put("bb", "come on");
+		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", map, requestListener, 0);
 	}
 	
 	/**
