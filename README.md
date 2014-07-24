@@ -3,7 +3,7 @@
 ####一、说明  
 AndroidVolley，Volley核心库工程(<https://github.com/mcxiaoke/android-volley>)。  
 AndroidVolleySample，网络请求工具示例工程。  
-Release，jar包。[直接下载](https://raw.githubusercontent.com/panxuewen/android-volley-manager/master/Release/android_volley_manager_1.01.jar)
+Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/android-volley-manager/master/Release/android_volley_manager_1.01.jar)
 
 ####二、Volley基本处理流程：  
 1、应用初始化Volley。  
