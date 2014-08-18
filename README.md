@@ -16,7 +16,7 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 8、Volley在上述2-7的基础上增加了Cache等附加处理环节。  
 
 ####三、网络请求工具  
-在AndroidVolley基础上扩展了com.android.http包，增加了ByteArrayRequest及RequestManager，方便字符型网络请求。  
+在AndroidVolley基础上扩展了com.android.http包，增加了ByteArrayRequest及RequestManager，方便字符数据类型(JSON/XML)的网络请求。  
 
 #####1.init RequestManager
 	public class VolleyApplication extends Application {
