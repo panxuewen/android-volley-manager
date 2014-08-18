@@ -1,7 +1,7 @@
 基于[Android Volley](https://github.com/mcxiaoke/android-volley)的网络请求工具。  
 =====================
 ####一、说明  
-AndroidVolley，Android Volley核心库工程及扩展。  
+AndroidVolley，Android Volley核心库及扩展工程。  
 AndroidVolleySample，网络请求工具示例工程。  
 Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/android-volley-manager/master/Release/android_volley_manager_1.01.jar)
 
