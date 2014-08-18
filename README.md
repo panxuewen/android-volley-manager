@@ -1,7 +1,7 @@
-基于Volley的网络请求工具。  
+基于[Android Volley](https://github.com/mcxiaoke/android-volley)的网络请求工具。  
 =====================
 ####一、说明  
-AndroidVolley，Volley核心库工程(<https://github.com/mcxiaoke/android-volley>)。  
+AndroidVolley，Android Volley核心库工程及扩展。  
 AndroidVolleySample，网络请求工具示例工程。  
 Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/android-volley-manager/master/Release/android_volley_manager_1.01.jar)
 
@@ -15,13 +15,15 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 7、ExecutorDelivery负责处理请求结果，并与主线程进行交互。  
 8、Volley在上述2-7的基础上增加了Cache等附加处理环节。  
 
-####三、网络请求工具示例  
+####三、网络请求工具  
+在AndroidVolley基础上扩展了com.android.http包，增加了ByteArrayRequest及RequestManager，方便字符型网络请求。  
+
 #####1.init RequestManager
 	public class VolleyApplication extends Application {
 		@Override
 		public void onCreate() {
 			super.onCreate();
-			RequestManager.getInstance().init(this);
+			RequestManager.getInstance().init(this);//初始化工具
 		}
 	
 		@Override
@@ -39,8 +41,8 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_main);
 
-			testPost();
-			testGet();
+			testPost();//POST请求示例
+			testGet();//GET请求示例
 		}
 		
 		/**
@@ -64,7 +66,7 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 
 			@Override
 			public void onRequest() {
-
+				System.out.println("onReqeust, start");
 			}
 
 			@Override
