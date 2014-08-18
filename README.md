@@ -18,7 +18,7 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 ####三、网络请求工具  
 在AndroidVolley基础上扩展了com.android.http包，增加了ByteArrayRequest及RequestManager，方便字符数据类型(JSON/XML)的网络请求。  
 
-#####1.init RequestManager
+#####1.初始化RequestManager
 	public class VolleyApplication extends Application {
 		@Override
 		public void onCreate() {
@@ -32,7 +32,7 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 		}
 	}
 
-#####2.make request by RequestManager
+#####2.使用RequestManager
 	public class MainActivity extends Activity {
 		private LoadControler loadControler = null;
 
@@ -41,26 +41,26 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_main);
 
-			testPost();//POST请求示例
-			testGet();//GET请求示例
+			testPost();
+			testGet();
 		}
 		
 		/**
-		 * test POST method
+		 * POST请求测试
 		 */
 		private void testPost() {
 			loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", null, requestListener, 0);
 		}
 		
 		/**
-		 * test GET method
+		 * GET请求测试
 		 */
 		private void testGet() {
 			loadControler = RequestManager.getInstance().get("http://allthelucky.ap01.aws.af.cm/memoServer", requestListener, 1);
 		}
 
 		/**
-		 * RequestListener for receiving result
+		 * 数据响应监听
 		 */
 		private RequestListener requestListener = new RequestListener() {
 
