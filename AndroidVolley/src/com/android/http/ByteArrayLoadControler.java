@@ -11,7 +11,9 @@ import com.android.volley.VolleyError;
  * 
  */
 class ByteArrayLoadControler extends AbsLoadControler implements Listener<byte[]>, ErrorListener {
+	
 	private LoadListener mOnLoadListener;
+	
 	private int mAction = 0;
 
 	public ByteArrayLoadControler(LoadListener requestListener, int actionId) {

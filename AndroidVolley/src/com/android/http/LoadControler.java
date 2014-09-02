@@ -19,6 +19,7 @@ public interface LoadControler {
  * 
  */
 class AbsLoadControler implements LoadControler {
+	
 	protected Request<?> mRequest;
 
 	public void bindRequest(Request<?> request) {

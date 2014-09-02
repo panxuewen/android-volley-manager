@@ -18,11 +18,15 @@ import com.android.volley.toolbox.Volley;
  * 
  */
 public class RequestManager {
+	
 	private static final String CHARSET_UTF_8 = "UTF-8";
+	
 	private volatile static RequestManager instance = null;
+	
 	private RequestQueue mRequestQueue = null;
 
 	public interface RequestListener {
+		
 		void onRequest();
 
 		void onSuccess(String response, String url, int actionId);
