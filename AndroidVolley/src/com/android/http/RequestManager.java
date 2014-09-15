@@ -53,6 +53,10 @@ public class RequestManager {
 		return instance;
 	}
 
+	public RequestQueue getRequestQueue () {
+		return this.mRequestQueue;
+	}
+	
 	/**
 	 * default get method
 	 * 
