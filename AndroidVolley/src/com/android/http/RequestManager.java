@@ -4,6 +4,7 @@ import java.io.UnsupportedEncodingException;
 
 import android.content.Context;
 
+import com.android.http.multipart.MultipartRequestParams;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
@@ -18,15 +19,15 @@ import com.android.volley.toolbox.Volley;
  * 
  */
 public class RequestManager {
-	
+
 	private static final String CHARSET_UTF_8 = "UTF-8";
-	
+
 	private volatile static RequestManager instance = null;
-	
+
 	private RequestQueue mRequestQueue = null;
 
 	public interface RequestListener {
-		
+
 		void onRequest();
 
 		void onSuccess(String response, String url, int actionId);
@@ -53,10 +54,10 @@ public class RequestManager {
 		return instance;
 	}
 
-	public RequestQueue getRequestQueue () {
+	public RequestQueue getRequestQueue() {
 		return this.mRequestQueue;
 	}
-	
+
 	/**
 	 * default get method
 	 * 
@@ -99,9 +100,23 @@ public class RequestManager {
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler post(final String url, Object data, final RequestListener requestListener,
-			boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
+	public LoadControler post(final String url, Object data, final RequestListener requestListener, boolean shouldCache,
+			int timeoutCount, int retryTimes, int actionId) {
 		return request(Method.POST, url, data, requestListener, shouldCache, timeoutCount, retryTimes, actionId);
+	}
+
+	/**
+	 * upload file
+	 * 
+	 * @param url
+	 * @param data
+	 * @param requestListener
+	 * @param actionId
+	 * @return
+	 */
+	public LoadControler upload(final String url, MultipartRequestParams data, final RequestListener requestListener,
+			int actionId) {
+		return request(Method.POST, url, data, requestListener, false, 10 * 1000, 1, actionId);
 	}
 
 	public LoadControler request(int method, final String url, Object data, final RequestListener requestListener,
@@ -136,11 +151,16 @@ public class RequestManager {
 			throw new NullPointerException();
 
 		final ByteArrayLoadControler loadControler = new ByteArrayLoadControler(requestListener, actionId);
-		Request<?> request = new ByteArrayRequest(method, url, data, loadControler, loadControler);
+
+		Request<?> request = null;
+		if (data != null && data instanceof MultipartRequestParams) {
+			request = new MultipartRequest(url, (MultipartRequestParams) data, loadControler, loadControler);
+		} else {
+			request = new ByteArrayRequest(method, url, data, loadControler, loadControler);
+		}
 		request.setShouldCache(shouldCache);
 
-		RetryPolicy retryPolicy = new DefaultRetryPolicy(timeoutCount, retryTimes,
-				DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+		RetryPolicy retryPolicy = new DefaultRetryPolicy(timeoutCount, retryTimes, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 		request.setRetryPolicy(retryPolicy);
 
 		loadControler.bindRequest(request);
