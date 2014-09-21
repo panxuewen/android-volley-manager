@@ -1,7 +1,7 @@
 基于[Android Volley](https://github.com/mcxiaoke/android-volley)的网络请求工具。  
 =====================
 ####一、说明
-支持Post类型：json、xml, Map<String,String>()、及MultipartRequestParams<String, File>()。  
+支持Post类型：json、xml、Map<String,String>()、及MultipartRequestParams<String, File>()。  
 AndroidVolley，Android Volley核心库及扩展工程。  
 AndroidVolleySample，网络请求工具示例工程。  
 Release，AndroidVolley jar包。
@@ -17,7 +17,7 @@ Release，AndroidVolley jar包。
 8、Volley在上述2-7的基础上增加了Cache等附加处理环节。  
 
 ####三、网络请求工具  
-在AndroidVolley基础上扩展了com.android.http包，增加了ByteArrayRequest及RequestManager，方便字符数据类型(JSON/XML)的网络请求。  
+在AndroidVolley基础上扩展了com.android.http包，增加了ByteArrayRequest及RequestManager，方便JSON、XML、Map<String, Sting>()、及MultipartRequestParams<String, File>()的网络请求。  
 
 #####1.初始化RequestManager
 	public class VolleyApplication extends Application {
