@@ -7,9 +7,9 @@ import android.app.Activity;
 import android.os.Bundle;
 
 import com.android.http.LoadControler;
-import com.android.http.MultipartRequestParams;
 import com.android.http.RequestManager;
 import com.android.http.RequestManager.RequestListener;
+import com.android.http.RequestMap;
 import com.android.volley.utils.R;
 
 public class MainActivity extends Activity {
@@ -24,17 +24,18 @@ public class MainActivity extends Activity {
 		testGet();
 		testFileUpload();
 	}
-	
+
 	/**
 	 * test POST method
 	 */
 	private void testPost() {
-		HashMap<String, String> map=new HashMap<String, String>();
+		HashMap<String, String> map = new HashMap<String, String>();
 		map.put("aa", "hello,world");
 		map.put("bb", "come on");
-		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", map, requestListener, 0);
+		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", map,
+				requestListener, 0);
 	}
-	
+
 	/**
 	 * test GET method
 	 */
@@ -46,13 +47,13 @@ public class MainActivity extends Activity {
 	 * test FileUpload
 	 */
 	private void testFileUpload() {
-		MultipartRequestParams  params = new MultipartRequestParams();
+		RequestMap params = new RequestMap();
 		params.put("file1", new File("/mnt/sdcard/out.txt"));
 		params.put("share", "1");
-		
+
 		loadControler = RequestManager.getInstance().post("http://upload.vdisk.cn/webupload", params, requestListener, 2);
 	}
-	
+
 	/**
 	 * RequestListener for receiving result
 	 */
@@ -60,17 +61,17 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onSuccess(String response, String url, int actionId) {
-			System.out.println("actionId:"+actionId+", OnSucess!\n"+response);
+			System.out.println("actionId:" + actionId + ", OnSucess!\n" + response);
 		}
 
 		@Override
 		public void onError(String errorMsg, String url, int actionId) {
-			System.out.println("actionId:"+actionId+", onError!\n"+errorMsg);
+			System.out.println("actionId:" + actionId + ", onError!\n" + errorMsg);
 		}
 
 		@Override
 		public void onRequest() {
-			
+
 		}
 	};
 
