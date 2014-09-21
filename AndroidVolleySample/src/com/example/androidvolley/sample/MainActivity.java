@@ -29,10 +29,8 @@ public class MainActivity extends Activity {
 	 * test POST method
 	 */
 	private void testPost() {
-		HashMap<String, String> map = new HashMap<String, String>();
-		map.put("aa", "hello,world");
-		map.put("bb", "come on");
-		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", map,
+		final String json = "{\"action\":\"test\", \"info\":\"hello world\"}";
+		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", json,
 				requestListener, 0);
 	}
 
