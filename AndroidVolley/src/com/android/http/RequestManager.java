@@ -4,7 +4,6 @@ import java.io.UnsupportedEncodingException;
 
 import android.content.Context;
 
-import com.android.http.multipart.MultipartRequestParams;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
@@ -153,12 +152,13 @@ public class RequestManager {
 		final ByteArrayLoadControler loadControler = new ByteArrayLoadControler(requestListener, actionId);
 
 		Request<?> request = null;
-		if (data != null && data instanceof MultipartRequestParams) {
-			request = new MultipartRequest(url, (MultipartRequestParams) data, loadControler, loadControler);
+		if (data != null && data instanceof MultipartRequestParams) {//force POST and No Cache
+			request = new ByteArrayRequest(Method.POST, url, data, loadControler, loadControler);
+			request.setShouldCache(false);
 		} else {
 			request = new ByteArrayRequest(method, url, data, loadControler, loadControler);
+			request.setShouldCache(shouldCache);
 		}
-		request.setShouldCache(shouldCache);
 
 		RetryPolicy retryPolicy = new DefaultRetryPolicy(timeoutCount, retryTimes, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 		request.setRetryPolicy(retryPolicy);
