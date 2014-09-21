@@ -1,9 +1,10 @@
 基于[Android Volley](https://github.com/mcxiaoke/android-volley)的网络请求工具。  
 =====================
-####一、说明  
+####一、说明
+支持Post类型：json、xml, Map<String,String>()、及MultipartRequestParams<String, File>()。  
 AndroidVolley，Android Volley核心库及扩展工程。  
 AndroidVolleySample，网络请求工具示例工程。  
-Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/android-volley-manager/master/Release/android_volley_manager_1.02.jar)
+Release，AndroidVolley jar包。
 
 ####二、Volley基本处理流程：  
 1、应用初始化Volley。  
@@ -43,6 +44,7 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 
 			testPost();
 			testGet();
+			testFileUpload();
 		}
 		
 		/**
@@ -57,6 +59,17 @@ Release，jar包。[直接下载](https://raw.githubusercontent.com/winfirm/andr
 		 */
 		private void testGet() {
 			loadControler = RequestManager.getInstance().get("http://allthelucky.ap01.aws.af.cm/memoServer", requestListener, 1);
+		}
+		
+		/**
+		 * 文件上传测试
+		 */
+		private void testFileUpload() {
+			MultipartRequestParams  params = new MultipartRequestParams();
+			params.put("file1", new File("/mnt/sdcard/out.txt"));
+			params.put("share", "1");
+			
+			loadControler = RequestManager.getInstance().post("http://upload.vdisk.cn/webupload", params, requestListener, 2);
 		}
 
 		/**
