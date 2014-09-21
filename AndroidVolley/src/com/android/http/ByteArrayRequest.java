@@ -36,8 +36,8 @@ class ByteArrayRequest extends Request<byte[]> {
 		this.mPostBody = postBody;
 		this.mListener = listener;
 
-		if (this.mPostBody != null && this.mPostBody instanceof MultipartRequestParams) {// contains file
-			this.httpEntity = ((MultipartRequestParams) this.mPostBody).getEntity();
+		if (this.mPostBody != null && this.mPostBody instanceof RequestParams) {// contains file
+			this.httpEntity = ((RequestParams) this.mPostBody).getEntity();
 		}
 	}
 

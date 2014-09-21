@@ -21,11 +21,11 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
- * MultipartRequestParams for key/value (include file)
+ * RequestParams for key/value (include Multipart file)
  * 
  * @author steven-pan
  */
-public class MultipartRequestParams {
+public class RequestParams {
 	private static String ENCODING = "UTF-8";
 
 	protected ConcurrentHashMap<String, String> urlParams;
@@ -35,11 +35,11 @@ public class MultipartRequestParams {
 	private final static char[] MULTIPART_CHARS = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			.toCharArray();
 
-	public MultipartRequestParams() {
+	public RequestParams() {
 		init();
 	}
 
-	public MultipartRequestParams(String key, String value) {
+	public RequestParams(String key, String value) {
 		init();
 		put(key, value);
 	}
