@@ -78,7 +78,7 @@ public class RequestManager {
 	 * 
 	 * @param url
 	 * @param data
-	 *            String or Map<String, String>
+	 *            String, Map<String, String> or RequestMap(with file)
 	 * @param requestListener
 	 * @param actionId
 	 * @return
@@ -91,7 +91,7 @@ public class RequestManager {
 	 * 
 	 * @param url
 	 * @param data
-	 *            String or Map<String, String>
+	 *            String, Map<String, String> or RequestMap(with file)
 	 * @param requestListener
 	 * @param shouldCache
 	 * @param timeoutCount
@@ -102,20 +102,6 @@ public class RequestManager {
 	public LoadControler post(final String url, Object data, final RequestListener requestListener, boolean shouldCache,
 			int timeoutCount, int retryTimes, int actionId) {
 		return request(Method.POST, url, data, requestListener, shouldCache, timeoutCount, retryTimes, actionId);
-	}
-
-	/**
-	 * upload file
-	 * 
-	 * @param url
-	 * @param data
-	 * @param requestListener
-	 * @param actionId
-	 * @return
-	 */
-	public LoadControler upload(final String url, RequestMap data, final RequestListener requestListener,
-			int actionId) {
-		return request(Method.POST, url, data, requestListener, false, 10 * 1000, 1, actionId);
 	}
 
 	public LoadControler request(int method, final String url, Object data, final RequestListener requestListener,

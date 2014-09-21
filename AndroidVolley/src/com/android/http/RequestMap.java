@@ -21,7 +21,7 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
 
 /**
- * RequestParams for key/value (include Multipart file)
+ * RequestMap for key/value (include Multipart file)
  * 
  * @author steven-pan
  */
