@@ -113,7 +113,7 @@ public class RequestManager {
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler upload(final String url, RequestParams data, final RequestListener requestListener,
+	public LoadControler upload(final String url, RequestMap data, final RequestListener requestListener,
 			int actionId) {
 		return request(Method.POST, url, data, requestListener, false, 10 * 1000, 1, actionId);
 	}
@@ -152,7 +152,7 @@ public class RequestManager {
 		final ByteArrayLoadControler loadControler = new ByteArrayLoadControler(requestListener, actionId);
 
 		Request<?> request = null;
-		if (data != null && data instanceof RequestParams) {//force POST and No Cache
+		if (data != null && data instanceof RequestMap) {//force POST and No Cache
 			request = new ByteArrayRequest(Method.POST, url, data, loadControler, loadControler);
 			request.setShouldCache(false);
 		} else {

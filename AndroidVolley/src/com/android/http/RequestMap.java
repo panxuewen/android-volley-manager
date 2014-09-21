@@ -25,7 +25,7 @@ import org.apache.http.message.BasicNameValuePair;
  * 
  * @author steven-pan
  */
-public class RequestParams {
+public class RequestMap {
 	private static String ENCODING = "UTF-8";
 
 	protected ConcurrentHashMap<String, String> urlParams;
@@ -35,11 +35,11 @@ public class RequestParams {
 	private final static char[] MULTIPART_CHARS = "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			.toCharArray();
 
-	public RequestParams() {
+	public RequestMap() {
 		init();
 	}
 
-	public RequestParams(String key, String value) {
+	public RequestMap(String key, String value) {
 		init();
 		put(key, value);
 	}
