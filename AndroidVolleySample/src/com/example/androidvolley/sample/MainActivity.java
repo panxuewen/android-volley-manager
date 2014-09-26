@@ -1,7 +1,6 @@
 package com.example.androidvolley.sample;
 
 import java.io.File;
-import java.util.HashMap;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,6 +9,9 @@ import com.android.http.LoadControler;
 import com.android.http.RequestManager;
 import com.android.http.RequestManager.RequestListener;
 import com.android.http.RequestMap;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageLoader.ImageContainer;
+import com.android.volley.toolbox.ImageLoader.ImageListener;
 import com.android.volley.utils.R;
 
 public class MainActivity extends Activity {
@@ -23,6 +25,7 @@ public class MainActivity extends Activity {
 		testPost();
 		testGet();
 		testFileUpload();
+		testImageLoader();
 	}
 
 	/**
@@ -72,6 +75,24 @@ public class MainActivity extends Activity {
 
 		}
 	};
+	
+	/**
+	 * test ImageLoader
+	 */
+	private void testImageLoader() {
+		NetworkApplication.getImageLoader().get("", new ImageListener() {
+			
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				
+			}
+			
+			@Override
+			public void onResponse(ImageContainer response, boolean isImmediate) {
+				
+			}
+		});
+	}
 
 	@Override
 	public void onBackPressed() {

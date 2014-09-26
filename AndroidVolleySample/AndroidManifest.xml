@@ -17,7 +17,7 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" android:name="com.example.androidvolley.sample.VolleyApplication">
+        android:theme="@style/AppTheme" android:name="com.example.androidvolley.sample.NetworkApplication">
         <activity
             android:name="com.example.androidvolley.sample.MainActivity"
             android:label="@string/app_name" >
