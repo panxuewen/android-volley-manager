@@ -1,9 +1,11 @@
 package com.android.http;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 import android.content.Context;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
@@ -20,6 +22,10 @@ import com.android.volley.toolbox.Volley;
 public class RequestManager {
 
 	private static final String CHARSET_UTF_8 = "UTF-8";
+
+	private static final int TIMEOUT_COUNT = 10 * 1000;
+
+	private static final int RETRY_TIMES = 1;
 
 	private volatile static RequestManager instance = null;
 
@@ -70,7 +76,7 @@ public class RequestManager {
 	}
 
 	public LoadControler get(String url, RequestListener requestListener, boolean shouldCache, int actionId) {
-		return this.request(Method.GET, url, null, requestListener, shouldCache, 10 * 1000, 1, actionId);
+		return this.request(Method.GET, url, null, null, requestListener, shouldCache, TIMEOUT_COUNT, RETRY_TIMES, actionId);
 	}
 
 	/**
@@ -84,7 +90,7 @@ public class RequestManager {
 	 * @return
 	 */
 	public LoadControler post(final String url, Object data, final RequestListener requestListener, int actionId) {
-		return this.post(url, data, requestListener, false, 10 * 1000, 1, actionId);
+		return this.post(url, data, requestListener, false, TIMEOUT_COUNT, RETRY_TIMES, actionId);
 	}
 
 	/**
@@ -101,12 +107,35 @@ public class RequestManager {
 	 */
 	public LoadControler post(final String url, Object data, final RequestListener requestListener, boolean shouldCache,
 			int timeoutCount, int retryTimes, int actionId) {
-		return request(Method.POST, url, data, requestListener, shouldCache, timeoutCount, retryTimes, actionId);
+		return request(Method.POST, url, data, null, requestListener, shouldCache, timeoutCount, retryTimes, actionId);
 	}
 
-	public LoadControler request(int method, final String url, Object data, final RequestListener requestListener,
-			boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
-		return this.sendRequest(method, url, data, new LoadListener() {
+	/**
+	 * request
+	 * 
+	 * @param method
+	 *            mainly Method.POST and Method.GET
+	 * @param url
+	 *            target url
+	 * @param data
+	 *            request params
+	 * @param headers
+	 *            request headers
+	 * @param requestListener
+	 *            request callback
+	 * @param shouldCache
+	 *            useCache
+	 * @param timeoutCount
+	 *            reqeust timeout count
+	 * @param retryTimes
+	 *            reqeust retry times
+	 * @param actionId
+	 *            request id
+	 * @return
+	 */
+	public LoadControler request(int method, final String url, Object data, final Map<String, String> headers,
+			final RequestListener requestListener, boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
+		return this.sendRequest(method, url, data, headers, new LoadListener() {
 			@Override
 			public void onStart() {
 				requestListener.onRequest();
@@ -130,20 +159,40 @@ public class RequestManager {
 		}, shouldCache, timeoutCount, retryTimes, actionId);
 	}
 
-	public LoadControler sendRequest(int method, final String url, Object data, final LoadListener requestListener,
-			boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
+	/**
+	 * @param method
+	 * @param url
+	 * @param data
+	 * @param headers
+	 * @param requestListener
+	 * @param shouldCache
+	 * @param timeoutCount
+	 * @param retryTimes
+	 * @param actionId
+	 * @return
+	 */
+	public LoadControler sendRequest(int method, final String url, Object data, final Map<String, String> headers,
+			final LoadListener requestListener, boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
 		if (requestListener == null)
 			throw new NullPointerException();
 
 		final ByteArrayLoadControler loadControler = new ByteArrayLoadControler(requestListener, actionId);
 
 		Request<?> request = null;
-		if (data != null && data instanceof RequestMap) {//force POST and No Cache
+		if (data != null && data instanceof RequestMap) {// force POST and No  Cache
 			request = new ByteArrayRequest(Method.POST, url, data, loadControler, loadControler);
 			request.setShouldCache(false);
 		} else {
 			request = new ByteArrayRequest(method, url, data, loadControler, loadControler);
 			request.setShouldCache(shouldCache);
+		}
+
+		if (headers != null && !headers.isEmpty()) {// add headers if not empty
+			try {
+				request.getHeaders().putAll(headers);
+			} catch (AuthFailureError e) {
+				e.printStackTrace();
+			}
 		}
 
 		RetryPolicy retryPolicy = new DefaultRetryPolicy(timeoutCount, retryTimes, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
