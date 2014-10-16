@@ -1,9 +1,14 @@
 package com.example.androidvolley.sample;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.widget.ImageView;
 
 import com.android.http.LoadControler;
 import com.android.http.RequestManager;
@@ -12,54 +17,75 @@ import com.android.http.RequestMap;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
-import com.android.volley.utils.R;
 
 public class MainActivity extends Activity {
-	private LoadControler loadControler = null;
+
+	private static final String OUT_FILE = "upload.txt";
+
+	private static final String OUT_DATA = "sadf464764sdf3ds1f3adsf789213557r12-34912-482130487321gjsaldfalfu2390q3rtheslafkhsdafhreasof";
+
+	private static final String POST_URL = "http://allthelucky.ap01.aws.af.cm/memoServer";
+
+	private static final String POST_JSON = "{\"action\":\"test\", \"info\":\"hello world\"}";
+
+	private static final String GET_URL = "https://raw.githubusercontent.com/panxw/android-volley-manager/master/test.txt";
+
+	private static final String UPLOAD_URL = "http://www.splashpadmobile.com/upload.php";
+
+	private LoadControler mLoadControler = null;
+
+	private ImageView mImageView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		this.mImageView = (ImageView) findViewById(R.id.imageView1);
 
-		testPost();
-		testGet();
-		testFileUpload();
-		testImageLoader();
+		this.testPost();
+		this.testGet();
+		this.testFileUpload();
+		this.testImageLoader();
 	}
 
-	/**
-	 * test POST method
-	 */
 	private void testPost() {
-		final String json = "{\"action\":\"test\", \"info\":\"hello world\"}";
-		loadControler = RequestManager.getInstance().post("http://allthelucky.ap01.aws.af.cm/memoServer", json,
-				requestListener, 0);
+		mLoadControler = RequestManager.getInstance().post(POST_URL, POST_JSON, requestListener, 0);
 	}
 
-	/**
-	 * test GET method
-	 */
 	private void testGet() {
-		loadControler = RequestManager.getInstance().get("http://allthelucky.ap01.aws.af.cm/memoServer", requestListener, 1);
+		mLoadControler = RequestManager.getInstance().get(GET_URL, requestListener, 1);
 	}
 
-	/**
-	 * test FileUpload
-	 */
 	private void testFileUpload() {
+		MainActivity.prepareFile(this);
+
 		RequestMap params = new RequestMap();
-		params.put("file1", new File("/mnt/sdcard/out.txt"));
+		File uploadFile = new File(this.getFilesDir(), OUT_FILE);
+		params.put("uploadedfile", uploadFile);
 		params.put("share", "1");
 
-		loadControler = RequestManager.getInstance().post("http://upload.vdisk.cn/webupload", params, requestListener, 2);
+		mLoadControler = RequestManager.getInstance().post(UPLOAD_URL, params, requestListener, 2);
 	}
 
-	/**
-	 * RequestListener for receiving result
-	 */
-	private RequestListener requestListener = new RequestListener() {
+	private void testImageLoader() {
+		NetworkApplication.getImageLoader().get("http://www.baidu.com/img/bdlogo.png", new ImageListener() {
 
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				System.out.println("Image onErrorResponse");
+			}
+
+			@Override
+			public void onResponse(ImageContainer response, boolean isImmediate) {
+				System.out.println("Image onResponse");
+				if (response != null && response.getBitmap() != null) {
+					mImageView.setImageBitmap(response.getBitmap());
+				}
+			}
+		});
+	}
+	
+	private RequestListener requestListener = new RequestListener() {
 		@Override
 		public void onSuccess(String response, String url, int actionId) {
 			System.out.println("actionId:" + actionId + ", OnSucess!\n" + response);
@@ -72,32 +98,38 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onRequest() {
-
+			System.out.println("request send...");
 		}
 	};
-	
-	/**
-	 * test ImageLoader
-	 */
-	private void testImageLoader() {
-		NetworkApplication.getImageLoader().get("", new ImageListener() {
-			
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				
-			}
-			
-			@Override
-			public void onResponse(ImageContainer response, boolean isImmediate) {
-				
-			}
-		});
-	}
 
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
-		loadControler.cancel();
+		if (mLoadControler != null) {
+			mLoadControler.cancel();
+		}
+	}
+
+	private static void prepareFile(Context context) {
+		FileOutputStream fos = null;
+		try {
+			fos = context.openFileOutput(OUT_FILE, Context.MODE_PRIVATE);
+			try {
+				fos.write(OUT_DATA.getBytes());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} finally {
+			if (fos != null) {
+				try {
+					fos.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 
 }
