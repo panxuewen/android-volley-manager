@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
@@ -87,7 +88,7 @@ public class MainActivity extends Activity {
 	
 	private RequestListener requestListener = new RequestListener() {
 		@Override
-		public void onSuccess(String response, String url, int actionId) {
+		public void onSuccess(String response, Map<String, String> headers, String url, int actionId) {
 			System.out.println("actionId:" + actionId + ", OnSucess!\n" + response);
 		}
 

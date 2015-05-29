@@ -20,6 +20,7 @@ import android.os.SystemClock;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
+import com.android.volley.Cache.Entry;
 import com.android.volley.Network;
 import com.android.volley.NetworkError;
 import com.android.volley.NetworkResponse;
@@ -43,9 +44,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * A network performing Volley requests over an {@link HttpStack}.
@@ -85,7 +88,7 @@ public class BasicNetwork implements Network {
         while (true) {
             HttpResponse httpResponse = null;
             byte[] responseContents = null;
-            Map<String, String> responseHeaders = new HashMap<String, String>();
+            Map<String, String> responseHeaders = Collections.emptyMap();
             try {
                 // Gather headers.
                 Map<String, String> headers = new HashMap<String, String>();
@@ -97,9 +100,22 @@ public class BasicNetwork implements Network {
                 responseHeaders = convertHeaders(httpResponse.getAllHeaders());
                 // Handle cache validation.
                 if (statusCode == HttpStatus.SC_NOT_MODIFIED) {
-                    return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED,
-                            request.getCacheEntry() == null ? null : request.getCacheEntry().data,
-                            responseHeaders, true);
+
+                    Entry entry = request.getCacheEntry();
+                    if (entry == null) {
+                        return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED, null,
+                                responseHeaders, true,
+                                SystemClock.elapsedRealtime() - requestStart);
+                    }
+
+                    // A HTTP 304 response does not have all header fields. We
+                    // have to use the header fields from the cache entry plus
+                    // the new ones from the response.
+                    // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.5
+                    entry.responseHeaders.putAll(responseHeaders);
+                    return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED, entry.data,
+                            entry.responseHeaders, true,
+                            SystemClock.elapsedRealtime() - requestStart);
                 }
                 
                 // Handle moved resources
@@ -124,7 +140,8 @@ public class BasicNetwork implements Network {
                 if (statusCode < 200 || statusCode > 299) {
                     throw new IOException();
                 }
-                return new NetworkResponse(statusCode, responseContents, responseHeaders, false);
+                return new NetworkResponse(statusCode, responseContents, responseHeaders, false,
+                        SystemClock.elapsedRealtime() - requestStart);
             } catch (SocketTimeoutException e) {
                 attemptRetryOnException("socket", request, new TimeoutError());
             } catch (ConnectTimeoutException e) {
@@ -147,7 +164,7 @@ public class BasicNetwork implements Network {
                 }
                 if (responseContents != null) {
                     networkResponse = new NetworkResponse(statusCode, responseContents,
-                            responseHeaders, false);
+                            responseHeaders, false, SystemClock.elapsedRealtime() - requestStart);
                     if (statusCode == HttpStatus.SC_UNAUTHORIZED ||
                             statusCode == HttpStatus.SC_FORBIDDEN) {
                         attemptRetryOnException("auth",
@@ -210,8 +227,8 @@ public class BasicNetwork implements Network {
             headers.put("If-None-Match", entry.etag);
         }
 
-        if (entry.serverDate > 0) {
-            Date refTime = new Date(entry.serverDate);
+        if (entry.lastModified > 0) {
+            Date refTime = new Date(entry.lastModified);
             headers.put("If-Modified-Since", DateUtils.formatDate(refTime));
         }
     }
@@ -254,8 +271,8 @@ public class BasicNetwork implements Network {
     /**
      * Converts Headers[] to Map<String, String>.
      */
-    private static Map<String, String> convertHeaders(Header[] headers) {
-        Map<String, String> result = new HashMap<String, String>();
+    protected static Map<String, String> convertHeaders(Header[] headers) {
+        Map<String, String> result = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
         for (int i = 0; i < headers.length; i++) {
             result.put(headers[i].getName(), headers[i].getValue());
         }

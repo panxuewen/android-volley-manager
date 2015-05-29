@@ -23,15 +23,15 @@ import com.android.volley.toolbox.HttpHeaderParser;
  * @author steven pan
  * 
  */
-class ByteArrayRequest extends Request<byte[]> {
+class ByteArrayRequest extends Request<NetworkResponse> {
 
-	private final Listener<byte[]> mListener;
+	private final Listener<NetworkResponse> mListener;
 
 	private Object mPostBody = null;
 
 	private HttpEntity httpEntity =null;
 
-	public ByteArrayRequest(int method, String url, Object postBody, Listener<byte[]> listener, ErrorListener errorListener) {
+	public ByteArrayRequest(int method, String url, Object postBody, Listener<NetworkResponse> listener, ErrorListener errorListener) {
 		super(method, url, errorListener);
 		this.mPostBody = postBody;
 		this.mListener = listener;
@@ -97,12 +97,12 @@ class ByteArrayRequest extends Request<byte[]> {
 	}
 
 	@Override
-	protected Response<byte[]> parseNetworkResponse(NetworkResponse response) {
-		return Response.success(response.data, HttpHeaderParser.parseCacheHeaders(response));
+	protected Response<NetworkResponse> parseNetworkResponse(NetworkResponse response) {
+		return Response.success(response, HttpHeaderParser.parseCacheHeaders(response));
 	}
 
 	@Override
-	protected void deliverResponse(byte[] response) {
+	protected void deliverResponse(NetworkResponse response) {
 		this.mListener.onResponse(response);
 	}
 

@@ -21,6 +21,8 @@ import android.os.SystemClock;
 import com.android.volley.Cache;
 import com.android.volley.VolleyLog;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
@@ -61,7 +63,7 @@ public class DiskBasedCache implements Cache {
     private static final float HYSTERESIS_FACTOR = 0.9f;
 
     /** Magic number for current version of cache file format. */
-    private static final int CACHE_MAGIC = 0x20120504;
+    private static final int CACHE_MAGIC = 0x20150306;
 
     /**
      * Constructs an instance of the DiskBasedCache at the specified directory.
@@ -112,11 +114,15 @@ public class DiskBasedCache implements Cache {
         File file = getFileForKey(key);
         CountingInputStream cis = null;
         try {
-            cis = new CountingInputStream(new FileInputStream(file));
+            cis = new CountingInputStream(new BufferedInputStream(new FileInputStream(file)));
             CacheHeader.readHeader(cis); // eat header
             byte[] data = streamToBytes(cis, (int) (file.length() - cis.bytesRead));
             return entry.toCacheEntry(data);
         } catch (IOException e) {
+            VolleyLog.d("%s: %s", file.getAbsolutePath(), e.toString());
+            remove(key);
+            return null;
+        }  catch (NegativeArraySizeException e) {
             VolleyLog.d("%s: %s", file.getAbsolutePath(), e.toString());
             remove(key);
             return null;
@@ -149,9 +155,9 @@ public class DiskBasedCache implements Cache {
             return;
         }
         for (File file : files) {
-            FileInputStream fis = null;
+            BufferedInputStream fis = null;
             try {
-                fis = new FileInputStream(file);
+                fis = new BufferedInputStream(new FileInputStream(file));
                 CacheHeader entry = CacheHeader.readHeader(fis);
                 entry.size = file.length();
                 putEntry(entry.key, entry);
@@ -195,9 +201,14 @@ public class DiskBasedCache implements Cache {
         pruneIfNeeded(entry.data.length);
         File file = getFileForKey(key);
         try {
-            FileOutputStream fos = new FileOutputStream(file);
+            BufferedOutputStream fos = new BufferedOutputStream(new FileOutputStream(file));
             CacheHeader e = new CacheHeader(key, entry);
-            e.writeHeader(fos);
+            boolean success = e.writeHeader(fos);
+            if (!success) {
+                fos.close();
+                VolleyLog.d("Failed to write header for %s", file.getAbsolutePath());
+                throw new IOException();
+            }
             fos.write(entry.data);
             fos.close();
             putEntry(key, e);
@@ -343,6 +354,9 @@ public class DiskBasedCache implements Cache {
         /** Date of this response as reported by the server. */
         public long serverDate;
 
+        /** The last modified date for the requested object. */
+        public long lastModified;
+
         /** TTL for this record. */
         public long ttl;
 
@@ -364,6 +378,7 @@ public class DiskBasedCache implements Cache {
             this.size = entry.data.length;
             this.etag = entry.etag;
             this.serverDate = entry.serverDate;
+            this.lastModified = entry.lastModified;
             this.ttl = entry.ttl;
             this.softTtl = entry.softTtl;
             this.responseHeaders = entry.responseHeaders;
@@ -387,9 +402,11 @@ public class DiskBasedCache implements Cache {
                 entry.etag = null;
             }
             entry.serverDate = readLong(is);
+            entry.lastModified = readLong(is);
             entry.ttl = readLong(is);
             entry.softTtl = readLong(is);
             entry.responseHeaders = readStringStringMap(is);
+
             return entry;
         }
 
@@ -401,6 +418,7 @@ public class DiskBasedCache implements Cache {
             e.data = data;
             e.etag = etag;
             e.serverDate = serverDate;
+            e.lastModified = lastModified;
             e.ttl = ttl;
             e.softTtl = softTtl;
             e.responseHeaders = responseHeaders;
@@ -417,6 +435,7 @@ public class DiskBasedCache implements Cache {
                 writeString(os, key);
                 writeString(os, etag == null ? "" : etag);
                 writeLong(os, serverDate);
+                writeLong(os, lastModified);
                 writeLong(os, ttl);
                 writeLong(os, softTtl);
                 writeStringStringMap(responseHeaders, os);

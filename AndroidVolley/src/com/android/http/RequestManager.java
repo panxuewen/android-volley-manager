@@ -35,7 +35,7 @@ public class RequestManager {
 
 		void onRequest();
 
-		void onSuccess(String response, String url, int actionId);
+		void onSuccess(String response, Map<String, String> headers, String url, int actionId);
 
 		void onError(String errorMsg, String url, int actionId);
 	}
@@ -142,14 +142,14 @@ public class RequestManager {
 			}
 
 			@Override
-			public void onSuccess(byte[] data, String url, int actionId) {
+			public void onSuccess(byte[] data, Map<String, String> headers, String url, int actionId) {
 				String parsed = null;
 				try {
 					parsed = new String(data, CHARSET_UTF_8);
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 				}
-				requestListener.onSuccess(parsed, url, actionId);
+				requestListener.onSuccess(parsed, headers, url, actionId);
 			}
 
 			@Override
