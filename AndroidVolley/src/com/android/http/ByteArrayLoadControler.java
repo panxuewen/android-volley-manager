@@ -8,7 +8,7 @@ import com.android.volley.VolleyError;
 /**
  * ByteArrayLoadControler implements Volley Listener & ErrorListener
  * 
- * @author steven pan
+ * @author panxw
  * 
  */
 class ByteArrayLoadControler extends AbsLoadControler implements

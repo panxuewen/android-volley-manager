@@ -8,7 +8,7 @@ import com.android.volley.toolbox.NetworkImageView;
 /**
  * WebImageView extends from NetworkImageView
  * 
- * @author pxw
+ * @author panxw
  * 
  */
 public class WebImageView extends NetworkImageView {

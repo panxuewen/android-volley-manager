@@ -20,7 +20,7 @@ import com.android.volley.toolbox.HttpHeaderParser;
 /**
  * ByteArrayRequest override getBody() and getParams()
  * 
- * @author steven pan
+ * @author panxw
  * 
  */
 class ByteArrayRequest extends Request<NetworkResponse> {

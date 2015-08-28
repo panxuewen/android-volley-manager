@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * LoadListener special for ByteArrayLoadControler
  * 
- * @author steven-pan
+ * @author panxw
  * 
  */
 public interface LoadListener {

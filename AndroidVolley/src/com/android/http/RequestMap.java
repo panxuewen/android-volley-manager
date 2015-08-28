@@ -23,7 +23,7 @@ import org.apache.http.message.BasicNameValuePair;
 /**
  * RequestMap for key/value (include Multipart file)
  * 
- * @author steven-pan
+ * @author panxw
  */
 public class RequestMap {
 	private static String ENCODING = "UTF-8";

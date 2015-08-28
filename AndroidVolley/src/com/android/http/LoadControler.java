@@ -5,7 +5,7 @@ import com.android.volley.Request;
 /**
  * LoadControler for Request
  * 
- * @author steven pan
+ * @author panxw
  * 
  */
 public interface LoadControler {

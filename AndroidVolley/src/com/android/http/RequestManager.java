@@ -1,6 +1,5 @@
 package com.android.http;
 
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import android.content.Context;
@@ -21,21 +20,23 @@ import com.android.volley.toolbox.Volley;
  */
 public class RequestManager {
 
-	private static final String CHARSET_UTF_8 = "UTF-8";
-
 	private static final int TIMEOUT_COUNT = 10 * 1000;
 
 	private static final int RETRY_TIMES = 1;
 
-	private volatile static RequestManager instance = null;
+	private volatile static RequestManager INSTANCE = null;
 
 	private RequestQueue mRequestQueue = null;
 
+	/**
+	 * Request Result Callback
+	 */
 	public interface RequestListener {
 
 		void onRequest();
 
-		void onSuccess(String response, Map<String, String> headers, String url, int actionId);
+		void onSuccess(String response, Map<String, String> headers,
+				String url, int actionId);
 
 		void onError(String errorMsg, String url, int actionId);
 	}
@@ -48,15 +49,20 @@ public class RequestManager {
 		this.mRequestQueue = Volley.newRequestQueue(context);
 	}
 
+	/**
+	 * SingleTon
+	 * 
+	 * @return
+	 */
 	public static RequestManager getInstance() {
-		if (null == instance) {
+		if (null == INSTANCE) {
 			synchronized (RequestManager.class) {
-				if (null == instance) {
-					instance = new RequestManager();
+				if (null == INSTANCE) {
+					INSTANCE = new RequestManager();
 				}
 			}
 		}
-		return instance;
+		return INSTANCE;
 	}
 
 	public RequestQueue getRequestQueue() {
@@ -71,12 +77,15 @@ public class RequestManager {
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler get(String url, RequestListener requestListener, int actionId) {
+	public LoadControler get(String url, RequestListener requestListener,
+			int actionId) {
 		return this.get(url, requestListener, true, actionId);
 	}
 
-	public LoadControler get(String url, RequestListener requestListener, boolean shouldCache, int actionId) {
-		return this.request(Method.GET, url, null, null, requestListener, shouldCache, TIMEOUT_COUNT, RETRY_TIMES, actionId);
+	public LoadControler get(String url, RequestListener requestListener,
+			boolean shouldCache, int actionId) {
+		return this.request(Method.GET, url, null, null, requestListener,
+				shouldCache, TIMEOUT_COUNT, RETRY_TIMES, actionId);
 	}
 
 	/**
@@ -89,8 +98,10 @@ public class RequestManager {
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler post(final String url, Object data, final RequestListener requestListener, int actionId) {
-		return this.post(url, data, requestListener, false, TIMEOUT_COUNT, RETRY_TIMES, actionId);
+	public LoadControler post(final String url, Object data,
+			final RequestListener requestListener, int actionId) {
+		return this.post(url, data, requestListener, false, TIMEOUT_COUNT,
+				RETRY_TIMES, actionId);
 	}
 
 	/**
@@ -105,9 +116,11 @@ public class RequestManager {
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler post(final String url, Object data, final RequestListener requestListener, boolean shouldCache,
+	public LoadControler post(final String url, Object data,
+			final RequestListener requestListener, boolean shouldCache,
 			int timeoutCount, int retryTimes, int actionId) {
-		return request(Method.POST, url, data, null, requestListener, shouldCache, timeoutCount, retryTimes, actionId);
+		return request(Method.POST, url, data, null, requestListener,
+				shouldCache, timeoutCount, retryTimes, actionId);
 	}
 
 	/**
@@ -133,30 +146,13 @@ public class RequestManager {
 	 *            request id
 	 * @return
 	 */
-	public LoadControler request(int method, final String url, Object data, final Map<String, String> headers,
-			final RequestListener requestListener, boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
-		return this.sendRequest(method, url, data, headers, new LoadListener() {
-			@Override
-			public void onStart() {
-				requestListener.onRequest();
-			}
-
-			@Override
-			public void onSuccess(byte[] data, Map<String, String> headers, String url, int actionId) {
-				String parsed = null;
-				try {
-					parsed = new String(data, CHARSET_UTF_8);
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
-				requestListener.onSuccess(parsed, headers, url, actionId);
-			}
-
-			@Override
-			public void onError(String errorMsg, String url, int actionId) {
-				requestListener.onError(errorMsg, url, actionId);
-			}
-		}, shouldCache, timeoutCount, retryTimes, actionId);
+	public LoadControler request(int method, final String url, Object data,
+			final Map<String, String> headers,
+			final RequestListener requestListener, boolean shouldCache,
+			int timeoutCount, int retryTimes, int actionId) {
+		return this.sendRequest(method, url, data, headers,
+				new RequestListenerHolder(requestListener), shouldCache,
+				timeoutCount, retryTimes, actionId);
 	}
 
 	/**
@@ -171,19 +167,25 @@ public class RequestManager {
 	 * @param actionId
 	 * @return
 	 */
-	public LoadControler sendRequest(int method, final String url, Object data, final Map<String, String> headers,
-			final LoadListener requestListener, boolean shouldCache, int timeoutCount, int retryTimes, int actionId) {
+	public LoadControler sendRequest(int method, final String url, Object data,
+			final Map<String, String> headers,
+			final LoadListener requestListener, boolean shouldCache,
+			int timeoutCount, int retryTimes, int actionId) {
 		if (requestListener == null)
 			throw new NullPointerException();
 
-		final ByteArrayLoadControler loadControler = new ByteArrayLoadControler(requestListener, actionId);
+		final ByteArrayLoadControler loadControler = new ByteArrayLoadControler(
+				requestListener, actionId);
 
 		Request<?> request = null;
-		if (data != null && data instanceof RequestMap) {// force POST and No  Cache
-			request = new ByteArrayRequest(Method.POST, url, data, loadControler, loadControler);
+		if (data != null && data instanceof RequestMap) {// force POST and No
+															// Cache
+			request = new ByteArrayRequest(Method.POST, url, data,
+					loadControler, loadControler);
 			request.setShouldCache(false);
 		} else {
-			request = new ByteArrayRequest(method, url, data, loadControler, loadControler);
+			request = new ByteArrayRequest(method, url, data, loadControler,
+					loadControler);
 			request.setShouldCache(shouldCache);
 		}
 
@@ -195,7 +197,8 @@ public class RequestManager {
 			}
 		}
 
-		RetryPolicy retryPolicy = new DefaultRetryPolicy(timeoutCount, retryTimes, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+		RetryPolicy retryPolicy = new DefaultRetryPolicy(timeoutCount,
+				retryTimes, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
 		request.setRetryPolicy(retryPolicy);
 
 		loadControler.bindRequest(request);
