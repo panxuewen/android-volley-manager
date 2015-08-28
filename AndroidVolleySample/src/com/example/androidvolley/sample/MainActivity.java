@@ -9,15 +9,11 @@ import java.util.Map;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.widget.ImageView;
 
 import com.android.http.LoadControler;
 import com.android.http.RequestManager;
 import com.android.http.RequestManager.RequestListener;
 import com.android.http.RequestMap;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.ImageLoader.ImageContainer;
-import com.android.volley.toolbox.ImageLoader.ImageListener;
 
 /**
  * 测试程序
@@ -25,7 +21,7 @@ import com.android.volley.toolbox.ImageLoader.ImageListener;
  * @author panxw
  *
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements RequestListener {
 
 	private static final String OUT_FILE = "upload.txt";
 
@@ -41,18 +37,14 @@ public class MainActivity extends Activity {
 
 	private LoadControler mLoadControler = null;
 
-	private ImageView mImageView;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		this.mImageView = (ImageView) findViewById(R.id.imageView1);
 
 		this.testPost();
 		this.testGet();
 		this.testFileUpload();
-		this.testImageLoader();
 	}
 
 	/**
@@ -60,15 +52,14 @@ public class MainActivity extends Activity {
 	 */
 	private void testPost() {
 		mLoadControler = RequestManager.getInstance().post(POST_URL, POST_JSON,
-				requestListener, 0);
+				this, 0);
 	}
 
 	/**
 	 * 测试GET
 	 */
 	private void testGet() {
-		mLoadControler = RequestManager.getInstance().get(GET_URL,
-				requestListener, 1);
+		mLoadControler = RequestManager.getInstance().get(GET_URL, this, 1);
 	}
 
 	/**
@@ -83,58 +74,24 @@ public class MainActivity extends Activity {
 		params.put("share", "1");
 
 		mLoadControler = RequestManager.getInstance().post(UPLOAD_URL, params,
-				requestListener, 2);
+				this, 2);
 	}
 
-	/**
-	 * 测试图片加载
-	 */
-	private void testImageLoader() {
-		NetworkApplication.getImageLoader().get(
-				"http://www.baidu.com/img/bdlogo.png", mImageListener);
+	@Override
+	public void onSuccess(String response, Map<String, String> headers,
+			String url, int actionId) {
+		System.out.println("actionId:" + actionId + ", OnSucess!\n" + response);
 	}
 
-	/**
-	 * 因ImageLoader将回调对象存放在了WeakReference中，所以这里要将ImageListener回调设置成类对象
-	 */
-	private ImageListener mImageListener = new ImageListener() {
-		@Override
-		public void onErrorResponse(VolleyError error) {
-			System.out.println("Image onErrorResponse");
-		}
+	@Override
+	public void onError(String errorMsg, String url, int actionId) {
+		System.out.println("actionId:" + actionId + ", onError!\n" + errorMsg);
+	}
 
-		@Override
-		public void onResponse(ImageContainer response, boolean isImmediate) {
-			System.out.println("Image onResponse");
-			if (response != null && response.getBitmap() != null) {
-				System.out.println("Image onResponse daata");
-				mImageView.setImageBitmap(response.getBitmap());
-			}
-		}
-	};
-
-	/**
-	 * 因RequestManager将回调对象存放在了WeakReference中，所以这里要将RequestListener回调设置成类对象
-	 */
-	private RequestListener requestListener = new RequestListener() {
-		@Override
-		public void onSuccess(String response, Map<String, String> headers,
-				String url, int actionId) {
-			System.out.println("actionId:" + actionId + ", OnSucess!\n"
-					+ response);
-		}
-
-		@Override
-		public void onError(String errorMsg, String url, int actionId) {
-			System.out.println("actionId:" + actionId + ", onError!\n"
-					+ errorMsg);
-		}
-
-		@Override
-		public void onRequest() {
-			System.out.println("request send...");
-		}
-	};
+	@Override
+	public void onRequest() {
+		System.out.println("request send...");
+	}
 
 	@Override
 	public void onBackPressed() {

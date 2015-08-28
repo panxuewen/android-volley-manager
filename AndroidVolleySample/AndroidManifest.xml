@@ -19,7 +19,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" android:name="com.example.androidvolley.sample.NetworkApplication">
         <activity
-            android:name="com.example.androidvolley.sample.MainActivity"
+            android:name="com.example.androidvolley.sample.ImageTestActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
