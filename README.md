@@ -129,7 +129,7 @@ Release，AndroidVolley jar包。
 		};
 	
 		/**
-		 * 因ImageLoader将回调对象存放在了WeakReference中，所以这里要将ImageListener回调设置成类对象
+		 * 因RequestManager将回调对象存放在了WeakReference中，所以这里要将RequestListener回调设置成类对象
 		 */
 		private RequestListener requestListener = new RequestListener() {
 			@Override
