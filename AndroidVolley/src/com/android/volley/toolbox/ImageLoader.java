@@ -21,12 +21,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.LinkedList;
 
@@ -320,7 +322,7 @@ public class ImageLoader {
          */
         private Bitmap mBitmap;
 
-        private final ImageListener mListener;
+        private final WeakReference<ImageListener> mListenerRef;
 
         /** The cache key that was associated with the request */
         private final String mCacheKey;
@@ -339,14 +341,14 @@ public class ImageLoader {
             mBitmap = bitmap;
             mRequestUrl = requestUrl;
             mCacheKey = cacheKey;
-            mListener = listener;
+            mListenerRef = new WeakReference<ImageLoader.ImageListener>(listener);
         }
 
         /**
          * Releases interest in the in-flight request (and cancels it if no one else is listening).
          */
         public void cancelRequest() {
-            if (mListener == null) {
+            if (mListenerRef == null) {
                 return;
             }
 
@@ -466,15 +468,21 @@ public class ImageLoader {
                             // If one of the callers in the batched request canceled the request
                             // after the response was received but before it was delivered,
                             // skip them.
-                            if (container.mListener == null) {
+                            if (container.mListenerRef == null) {
                                 continue;
                             }
-                            if (bir.getError() == null) {
-                                container.mBitmap = bir.mResponseBitmap;
-                                container.mListener.onResponse(container, false);
-                            } else {
-                                container.mListener.onErrorResponse(bir.getError());
-                            }
+							if (bir.getError() == null) {
+								container.mBitmap = bir.mResponseBitmap;
+								if (container.mListenerRef.get() != null) {
+									container.mListenerRef.get().onResponse(
+											container, false);
+								}
+							} else {
+								if (container.mListenerRef.get() != null) {
+									container.mListenerRef.get()
+											.onErrorResponse(bir.getError());
+								}
+							}
                         }
                     }
                     mBatchedResponses.clear();
