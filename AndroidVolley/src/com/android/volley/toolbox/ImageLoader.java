@@ -469,12 +469,18 @@ public class ImageLoader {
                             if (container.mListener == null) {
                                 continue;
                             }
-                            if (bir.getError() == null) {
-                                container.mBitmap = bir.mResponseBitmap;
-                                container.mListener.onResponse(container, false);
-                            } else {
-                                container.mListener.onErrorResponse(bir.getError());
-                            }
+							if (bir.getError() == null) {
+								container.mBitmap = bir.mResponseBitmap;
+								if (container.mListener != null) {
+									container.mListener.onResponse(container,
+											false);
+								}
+							} else {
+								if (container.mListener != null) {
+									container.mListener.onErrorResponse(bir
+											.getError());
+								}
+							}
                         }
                     }
                     mBatchedResponses.clear();

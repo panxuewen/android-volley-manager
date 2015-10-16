@@ -3,6 +3,9 @@ package com.android.http;
 import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.Map;
+
+import android.app.Activity;
+
 import com.android.http.RequestManager.RequestListener;
 
 /**
@@ -16,16 +19,29 @@ public class RequestListenerHolder implements LoadListener {
 
 	private WeakReference<RequestListener> mRequestListenerRef;
 
+	private RequestListener mRequestListener;
+
 	public RequestListenerHolder(RequestListener requestListener) {
-		this.mRequestListenerRef = new WeakReference<RequestListener>(
-				requestListener);
+		if (requestListener instanceof Activity) {
+			this.mRequestListenerRef = new WeakReference<RequestListener>(
+					requestListener);
+		} else {
+			this.mRequestListener = requestListener;
+		}
 	}
 
 	@Override
 	public void onStart() {
-		RequestListener requestListener = mRequestListenerRef.get();
-		if (requestListener != null) {
-			requestListener.onRequest();
+		if (mRequestListenerRef != null) {
+			RequestListener requestListener = mRequestListenerRef.get();
+			if (requestListener != null) {
+				requestListener.onRequest();
+				return;
+			}
+		}
+
+		if (this.mRequestListener != null) {
+			this.mRequestListener.onRequest();
 		}
 	}
 
@@ -38,17 +54,32 @@ public class RequestListenerHolder implements LoadListener {
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 		}
-		RequestListener requestListener = mRequestListenerRef.get();
-		if (requestListener != null) {
-			requestListener.onSuccess(parsed, headers, url, actionId);
+
+		if (mRequestListenerRef != null) {
+			RequestListener requestListener = mRequestListenerRef.get();
+			if (requestListener != null) {
+				requestListener.onSuccess(parsed, headers, url, actionId);
+				return;
+			}
+		}
+
+		if (this.mRequestListener != null) {
+			this.mRequestListener.onSuccess(parsed, headers, url, actionId);
 		}
 	}
 
 	@Override
 	public void onError(String errorMsg, String url, int actionId) {
-		RequestListener requestListener = mRequestListenerRef.get();
-		if (requestListener != null) {
-			requestListener.onError(errorMsg, url, actionId);
+		if (mRequestListenerRef != null) {
+			RequestListener requestListener = mRequestListenerRef.get();
+			if (requestListener != null) {
+				requestListener.onError(errorMsg, url, actionId);
+				return;
+			}
+		}
+
+		if (this.mRequestListener != null) {
+			this.mRequestListener.onError(errorMsg, url, actionId);
 		}
 	}
 }
