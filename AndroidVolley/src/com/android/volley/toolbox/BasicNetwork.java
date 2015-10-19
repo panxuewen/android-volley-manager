@@ -21,11 +21,6 @@ import android.os.SystemClock;
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
 import com.android.volley.Cache.Entry;
-import com.android.volley.apache.HttpEntity;
-import com.android.volley.apache.HttpHeader;
-import com.android.volley.apache.HttpResponse;
-import com.android.volley.apache.HttpStatus;
-import com.android.volley.apache.StatusLine;
 import com.android.volley.Network;
 import com.android.volley.NetworkError;
 import com.android.volley.NetworkResponse;
@@ -37,6 +32,12 @@ import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.StatusLine;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.cookie.DateUtils;
 
 import java.io.IOException;
@@ -143,6 +144,8 @@ public class BasicNetwork implements Network {
                         SystemClock.elapsedRealtime() - requestStart);
             } catch (SocketTimeoutException e) {
                 attemptRetryOnException("socket", request, new TimeoutError());
+            } catch (ConnectTimeoutException e) {
+                attemptRetryOnException("connection", request, new TimeoutError());
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Bad URL " + request.getUrl(), e);
             } catch (IOException e) {
@@ -255,7 +258,7 @@ public class BasicNetwork implements Network {
             try {
                 // Close the InputStream and release the resources by "consuming the content".
                 entity.consumeContent();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 // This can happen if there was an exception above that left the entity in
                 // an invalid state.
                 VolleyLog.v("Error occured when calling consumingContent");
@@ -268,7 +271,7 @@ public class BasicNetwork implements Network {
     /**
      * Converts Headers[] to Map<String, String>.
      */
-    protected static Map<String, String> convertHeaders(HttpHeader[] headers) {
+    protected static Map<String, String> convertHeaders(Header[] headers) {
         Map<String, String> result = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
         for (int i = 0; i < headers.length; i++) {
             result.put(headers[i].getName(), headers[i].getValue());

@@ -20,13 +20,15 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Request.Method;
 
-
-
-import com.android.volley.apache.HttpEntity;
-import com.android.volley.apache.HttpHeader;
-import com.android.volley.apache.HttpResponse;
-import com.android.volley.apache.ProtocolVersion;
-import com.android.volley.apache.StatusLine;
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.ProtocolVersion;
+import org.apache.http.StatusLine;
+import org.apache.http.entity.BasicHttpEntity;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicHttpResponse;
+import org.apache.http.message.BasicStatusLine;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -110,13 +112,13 @@ public class HurlStack implements HttpStack {
             // Signal to the caller that something was wrong with the connection.
             throw new IOException("Could not retrieve response code from HttpUrlConnection.");
         }
-        StatusLine responseStatus = new StatusLine(protocolVersion,
+        StatusLine responseStatus = new BasicStatusLine(protocolVersion,
                 connection.getResponseCode(), connection.getResponseMessage());
-        HttpResponse response = new HttpResponse(responseStatus);
+        BasicHttpResponse response = new BasicHttpResponse(responseStatus);
         response.setEntity(entityFromConnection(connection));
         for (Entry<String, List<String>> header : connection.getHeaderFields().entrySet()) {
             if (header.getKey() != null) {
-                HttpHeader h = new HttpHeader(header.getKey(), header.getValue().get(0));
+                Header h = new BasicHeader(header.getKey(), header.getValue().get(0));
                 response.addHeader(h);
             }
         }
@@ -129,7 +131,7 @@ public class HurlStack implements HttpStack {
      * @return an HttpEntity populated with data from <code>connection</code>.
      */
     private static HttpEntity entityFromConnection(HttpURLConnection connection) {
-    	HttpEntity entity = new HttpEntity();
+        BasicHttpEntity entity = new BasicHttpEntity();
         InputStream inputStream;
         try {
             inputStream = connection.getInputStream();
